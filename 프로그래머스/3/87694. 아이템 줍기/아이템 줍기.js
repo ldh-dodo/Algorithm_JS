@@ -13,6 +13,7 @@ function solution(rectangle, characterX, characterY, itemX, itemY) {
     itemY *= 2;
     
     rectangle = rectangle.map((rect) => rect.map((item) => item * 2));
+    
     let map = Array.from({ length: 102 }, () => Array(102).fill(0));
 
     for(const [lx, ly, rx, ry] of rectangle) {
@@ -22,7 +23,7 @@ function solution(rectangle, characterX, characterY, itemX, itemY) {
                         if(map[cy][cx] !== 2) {
                             map[cy][cx] = 1;
                         }
-                    }
+                    } 
                     // 내부는 2으로 표시
                     else {
                         map[cy][cx] = 2;
@@ -30,13 +31,14 @@ function solution(rectangle, characterX, characterY, itemX, itemY) {
             }
         }
     }
+    
     const res = bfs();
     return res;
     
     function bfs() {
         let visited = Array.from({ length: 102 }, () => Array(102).fill(false));
 
-        const q = [[characterY, characterX, 0]];
+        const q = [[characterX, characterY, 0]];
         visited[characterY][characterX] = true;
         
         while(q.length > 0) {
