@@ -169,5 +169,5 @@ function solution(board) {
                 && (board[ay][ax] && board[by][bx]));
     }
     // 6번 테스트만 틀림. 어떤걸 놓쳤나?
-    
+    // canGo 변수들은 단순히 이동만 검사하는 것으로, 방문 여부를 검사하기 전에 체크함으로써 해결
 }
