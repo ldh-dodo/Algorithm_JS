@@ -37,7 +37,7 @@ function solution(beginning, target) {
 
     let isSolved1 = copyFlag.every((row) => row.every((flag) => flag === 0));
 
-    // 열 다른 것 -> 열 다른 것
+    // 열 다른 것 -> 행 다른 것
     copyFlag = JSON.parse(JSON.stringify(flagArr));
 
     for(let j = 0; j < colLen; j++) {
@@ -86,9 +86,37 @@ function solution(beginning, target) {
 
     const isSolved3 = copyFlag.every((row) => row.every((flag) => flag === 0));
     
-     if(isSolved1 && isSolved2 && isSolved3) return Math.min(res1, res2, res3);
-     else if(isSolved1) return res1;
-     else if(isSolved2) return res2;
-    else if(isSolved3) return res3;
-     else return -1;
+    // 열 안다른 것 -> 행 다른 것
+    copyFlag = JSON.parse(JSON.stringify(flagArr));
+
+    for(let j = 0; j < colLen; j++) {
+        if(copyFlag[0][j] === 1) continue;
+
+        res4++;
+
+        for(let i = 0; i < rowLen; i++) {
+            copyFlag[i][j] = 1 ^ copyFlag[i][j];
+        }
+    }
+
+    for(let i = 0; i < rowLen; i++) {
+        if(copyFlag[i][0] === 0) continue;
+
+        res4++;
+
+        for(let j = 0; j < colLen; j++) {
+            copyFlag[i][j] = 1 ^ copyFlag[i][j];
+        }
+    }
+
+    const isSolved4 = copyFlag.every((row) => row.every((flag) => flag === 0));
+    
+    if(!isSolved1) res1 = Infinity;
+    if(!isSolved2) res2 = Infinity;
+    if(!isSolved3) res3 = Infinity;
+    if(!isSolved4) res4 = Infinity;
+    
+    const min = Math.min(res1, res2, res3, res4);
+    
+    return min === Infinity ? -1 : min;
 }
