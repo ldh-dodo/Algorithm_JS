@@ -1,33 +1,38 @@
 function solution(m, n, puddles) {
     /*
-
-    조건
-    1. 오른쪽 혹은 아래로만 이동
-    2. puddles 좌표는 거칠 수 없음
+        n : 행
+        m : 열
+        
+        시작 좌표 (1,1)
+        아래, 오른쪽으로만 이동 가능
     */
     const DIVISOR = 1000000007;
     
-    let arr = new Array(n+1).fill(0).map(() => new Array(m+1).fill(0));
-    arr[1][1] = 1;
-    
-    for(let i = 0; i < puddles.length; i++){
-        let [cy, cx] = puddles[i];
-        
-        arr[cx][cy] = -1;
+    let dp = Array.from({length : n + 1}, () => Array.from({length : m + 1}, () => 0));
+           
+    for(const [x, y] of puddles) {
+        dp[y][x] = -1;
     }
     
-    for(let i = 1; i <= n; i++){
-        for(let j = 1; j <=m; j++){
-            if(arr[i][j] === -1){
-                arr[i][j] = 0;
-                continue;
-            }
+    for(let i = 1; i <= m; i++) {
+        if(dp[1][i] === -1) break;
+        dp[1][i] = 1;
+    }
+    
+    for(let i = 1; i <= n; i++) {
+        if(dp[i][1] === -1) break;
+         dp[i][1] = 1;  
+    }
+
+    
+    for(let i = 2; i <= n; i++) {
+        for(let j = 2; j <= m; j++) {
+            if(dp[i][j] === -1) continue;
             
-            if(i > 1) arr[i][j] += arr[i-1][j];
-            if(j > 1) arr[i][j] += arr[i][j-1];
-            
-            arr[i][j] %= DIVISOR;
+            dp[i][j] = ((dp[i][j - 1] === -1 ? 0 : dp[i][j - 1]) + 
+                (dp[i - 1][j] === -1 ? 0 : dp[i - 1][j])) % DIVISOR;
         }
-    }
-    return arr[n][m];
+    }    
+    
+    return dp[n][m];
 }
