@@ -1,28 +1,12 @@
 function solution(n, s) {
-    let answer = [];
+    if(s / n < 1) return [-1];
+    let remain = s % n;
     
-    /*
-    s / n = quotient
-    s % n = remainder
+    let answer = Array.from({length : n}, () => Math.floor(s / n));
     
-    n - remainder 만큼 quotient를 채우고
-    remiander 개수 만큼 quotient + 1을 채우기
-    */
-    
-    let quotient, remainder;
-    
-    quotient  = Math.floor(s / n);
-    remainder = s % n;
-    
-    if(quotient === 0){
-        return [-1];
-    }
-    
-    for(let i = 0; i < n - remainder; i++){
-        answer.push(quotient);
-    }
-    for(let i = 0; i < remainder; i++){
-        answer.push(quotient+1);
+    while(remain > 0) {
+        answer[answer.length - remain] += 1;
+        remain--;
     }
     
     return answer;
