@@ -1,28 +1,24 @@
 function solution(n, stations, w) {
     let answer = 0;
+    let left = 1;
 
-    // N이 2억. 따라서 2억개의 배열로 방문검사를 하기에는 힘들어보임
-    // station 오름차순
-    // 각 기지국의 왼쪽 전부 처리하고, 나머지 마지막 기지국의 오른쪽 처리하기
-    
-    let cur_pos = 1;
-    let w_range = 2 * w + 1;
-    
-    // 왼쪽처리
-    for(let i = 0; i < stations.length; i++){
-        let left = stations[i] - w;
+    for(let i = 0; i < stations.length; i++) {
+        if(left > n) break;
+        // 각 stations의 왼쪽개수만 처리
+        // left ~ cur - W - 1 인덱스까지 처리.
+        // 이후 left <- cur + W + 1
         
-        if(cur_pos < left){
-            answer += Math.ceil((left - cur_pos)/ w_range);
-        }
+        const cur = stations[i];
+        const right = cur - w - 1;
+        const cnt = right - left + 1;
         
-        cur_pos = stations[i] + w + 1;
+        answer += Math.ceil(cnt / (2 * w + 1));
+        left = cur + w + 1;
     }
     
-    // 마지막 st의 오른쪽 처리
-    
-    if(cur_pos <= n){
-        answer += Math.ceil((n-cur_pos + 1) / w_range);
+    // 마지막 stations의 오른쪽 처리
+    if(left <= n) {
+        answer += Math.ceil((n - left + 1) / (2 * w + 1));
     }
     
     return answer;
