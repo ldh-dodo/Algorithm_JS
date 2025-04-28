@@ -1,48 +1,31 @@
 function solution(genres, plays) {
-    /*
-    1. genres를 순회하며 각 장르별 plays 합 정리, 
-    2. 
-    */
+    // 장르 -> 노래 -> 고유번호
     let answer = [];
-    let sumHash = {}; // [genre : plays 총 합]
-    let musicHash = {};
+    let musics = {};
     
-    let len = genres.length;
-    
-    for(let i = 0; i < len; i++){
-        let genre = genres[i];
-        sumHash[genre] = (sumHash[genre] | 0) + plays[i];
+    for(let i = 0; i < genres.length; i++) {
+        const genre = genres[i];
         
-        musicHash[genre] = musicHash[genre] || [];
-        musicHash[genre] = [...musicHash[genre], i];
+        if(musics[genre] === undefined) musics[genre] = [];
+        
+        musics[genre].push([plays[i],i]);
     }
     
-    let sorted_sumHash = Object.entries(sumHash);
-    sorted_sumHash.sort(([, valueA], [, valueB]) => valueB - valueA);
+    musics = Object.entries(musics);
+    musics = musics.map((music) => [music[1].reduce((acc,cur) => acc + cur[0], 0), [...music[1]]]);
     
-    for(let i = 0; i < sorted_sumHash.length; i++){
-        let genre = sorted_sumHash[i][0];
-        let numberArr = musicHash[genre];
-        
-        let tempHash = {};
-        for(let j = 0; j < numberArr.length; j++){
-            let num = numberArr[j];
-            
-            tempHash[num] = plays[num];
-        }
-        let sorted_tempHash = Object.entries(tempHash);
-        sorted_tempHash.sort(([num1, value1], [num2, value2]) => {
-            if(value1 === value2){
-                return num1 - num2;
-            }
-            return value2 - value1;
-        });
-        
-        for(let i = 0; i < 2; i++){
-            if(sorted_tempHash[i]){
-                answer.push(Number(sorted_tempHash[i][0]));
-            }
-        }
+    musics.sort((a, b) => {
+        return b[0] - a[0];
+    });
+ 
+    musics = musics.map((music) => [music[0], 
+                           music[1].sort((a, b) => a[0] === b[0] ? a[1] - b[1] : b[0] - a[0]).filter((_, idx) => idx < 2)]);
+    
+    for(let i = 0; i < musics.length; i++) {
+        musics[i][1].forEach(([plays, i]) => {
+             answer.push(i);
+        })
     }
+    
     return answer;
 }
