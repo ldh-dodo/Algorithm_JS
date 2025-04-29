@@ -1,29 +1,27 @@
 function solution(sticker) {
-    // 첫 번째 스티커 뜯는 경우
-    // 첫 번째 스티커 뜯지 않는 경우
+    const SIZE = sticker.length;
+          
+    if(SIZE === 1) return sticker[0];
     
-    let len = sticker.length;
-    if(len === 1) return sticker[0];
+    let dp1 = new Array(SIZE).fill(0);
+    let dp2 = new Array(SIZE).fill(0);
     
-    let dp = new Array(len).fill(0);
+    dp1[0] = sticker[0];
+    dp1[1] = sticker[0];
     
-    // 첫 번째 스티커 뜯고, 마지막 스티커 제외한 경우 (1 ~ len-1)
-    dp[0] = sticker[0];
-    dp[1] = sticker[0];
-    
-    for(let i = 2; i < len - 1; i++){
-        dp[i] = Math.max(dp[i-1], dp[i-2] + sticker[i]);
+    for(let i = 2; i < SIZE - 1; i++) {
+        dp1[i] = Math.max(dp1[i - 1], dp1[i - 2] + sticker[i]);
     }
-    let max = dp[len-2];
     
-    dp = new Array(len).fill(0);
+    let max = dp1[SIZE - 2];
+
+    dp2[1] = sticker[1];
     
-    dp[1] = sticker[1];
-    
-    for(let i = 2; i < len; i++){
-        dp[i] = Math.max(dp[i-1], dp[i-2] + sticker[i]);
+    for(let i = 2; i < SIZE; i++) {
+        dp2[i] = Math.max(dp2[i - 1], dp2[i - 2] + sticker[i]);
     }
-    max = Math.max(max, dp[len-1]);
+    
+    max = Math.max(max, dp2[SIZE - 1]);
     
     return max;
 }
