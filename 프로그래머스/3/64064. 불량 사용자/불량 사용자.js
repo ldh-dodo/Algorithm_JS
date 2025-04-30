@@ -1,31 +1,28 @@
-function isMatch(userStr, bannedStr){
-    let replaceBannedStr = bannedStr.replace(/\*/g, '.');
-    const regex = new RegExp('^' + replaceBannedStr + '$');
-    return regex.test(userStr);    
-}
-
-function solution(user_id, banned_id) {
+function solution(userIds, bannedIds) {
     let bannedList = new Set();
     
-    function findBannedList(bannedIdx, selected){
-        if(bannedIdx === banned_id.length){
-            const sortedList = [...selected].sort().join(',');
-            bannedList.add(sortedList);
-            return;
+    bannedIds = bannedIds.map((id) => id.replaceAll('*', '.'));
+    find(0, new Set());
+    
+    function find(bannedIdx, list) {
+        if(bannedIdx >= bannedIds.length) {
+            bannedList.add([...list].sort().join());
         }
         
-        for(let i = 0; i < user_id.length; i++){
-            let checkValidity = !selected.has(user_id[i]) && 
-                isMatch(user_id[i], banned_id[bannedIdx]);
-            if(checkValidity){
-                selected.add(user_id[i]);
-                findBannedList(bannedIdx + 1, selected);
-                selected.delete(user_id[i]);
-            }
+        for(let i = 0; i < userIds.length; i++) {
+            const [bannedId, userId] = [bannedIds[bannedIdx], userIds[i]];
+            if(!canInsert(bannedId, userId, list)) continue;
+            
+            list.add(userId);
+            find(bannedIdx + 1, list);
+            list.delete(userId);
         }
     }
     
-    findBannedList(0, new Set());
+    function canInsert(bannedId, userId, list) {
+        const regex = new RegExp(`^${bannedId}$`);
+        return !list.has(userId) && regex.test(userId);
+    }
     
     return bannedList.size;
 }
