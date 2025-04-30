@@ -1,29 +1,39 @@
-function solution(gems) {    
-    const set = new Set(gems);
-    const map = new Map();
+function solution(gems) {
+    // sliding window
+    let answer = [];
     
-    const targetSize = set.size;
+    let totalType = new Set(gems).size;
+    let map = new Map();
+    
     let left = 0;
-    let minLength = gems.length + 1;
-    let answer = [null, null];
+    let right = 0;
+    let minRange = Infinity;
     
-    for(let right = 0; right < gems.length; right++){
-        map.set(gems[right], (map.get(gems[right]) || 0) + 1);
+    while(right < gems.length) {
+        const gem = gems[right++];
+        const qty = map.get(gem) || 0;
         
-        while(map.size === targetSize){ // 오른쪽으로 영역 확장
-            if(right - left + 1 < minLength){
-                minLength = right - left + 1;
-                answer = [left+1, right+1];
-            }
-            // 확장된 오른쪽 영역을 왼쪽에서부터 줄여나가면서, 더 좁은 범위 탐색
+        map.set(gem, qty + 1);
+        
+        while(map.size === totalType) {
+            const range = right - left;
             
-            map.set(gems[left], map.get(gems[left]) - 1);
-            if(map.get(gems[left]) === 0){
-                map.delete(gems[left]);
+            if(range < minRange) {
+                minRange = range;
+                answer = [left + 1, right];
             }
+            
+            let leftGem = gems[left];
+            let leftQty = map.get(leftGem);
+            
+            if(leftQty > 1) {
+                map.set(leftGem, leftQty - 1);
+            } else {
+                map.delete(leftGem);
+            }
+            
             left++;
         }
     }
-    
     return answer;
 }
