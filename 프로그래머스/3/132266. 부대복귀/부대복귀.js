@@ -1,48 +1,30 @@
 function solution(n, roads, sources, destination) {
     let answer = [];
+    const graph = new Array(n + 1).fill().map(() => []);
+    let memo = new Array(n + 1).fill(-1);
     
-    len = n + 1;
-    
-    let graph = Array(len).fill().map(() => []);
-    
-    for(let i = 0; i < roads.length; i++) {
-        let [start, end] = roads[i];
-        
-        graph[start].push(end);
-        graph[end].push(start);
+    for(const [u, v] of roads) {
+        graph[u].push(v);
+        graph[v].push(u);
     }
     
+    let q = [destination];
+    memo[destination] = 0;
     
-    const bfs = (start) => {
-        let q = [start];
-        let dist = Array(len).fill(-1);
+    while(q.length > 0) {
+        const cur = q.shift();
         
-        const isValid = (source) => dist[source] === -1;
-        
-        dist[start] = 0;
-        
- 
-        while(q.length > 0) {
-            const curPos = q.shift();
+        for(const next of graph[cur]) {
+            if(memo[next] !== -1) continue;
             
-            graph[curPos].forEach((nextPos) => {
-                if(!isValid(nextPos)) return;
-                
-                q.push(nextPos);
-                dist[nextPos] = dist[curPos] + 1;
-            });
+            memo[next] = memo[cur] + 1;
+            q.push(next);
         }
-        
-        return dist;
     }
     
-    const DestToSource = bfs(destination);
-    
-    console.log(DestToSource);
-    
-    sources.forEach((source) => {
-        answer.push(DestToSource[source]);
-    })
+    for(const source of sources) {
+        answer.push(memo[source]);
+    }
     
     return answer;
 }
