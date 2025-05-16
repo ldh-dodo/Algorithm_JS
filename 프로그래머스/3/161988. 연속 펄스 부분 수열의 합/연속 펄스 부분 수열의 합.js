@@ -1,59 +1,44 @@
-function solution(sequence) {    
-    // 기본적으로 순회시 O(N^2) 
-    
-    let curValue;
-    let temp = new Array(sequence.length).fill(1);
-    
-    // 펄스 수열이 1, -1 .. 일 때 
-    let purse1 = temp.map((ONE, idx) => idx % 2 === 0 ? 1 : -1);
-    
-    // 펄스 수열이 -1, 1 .. 일 때 
-    let purse2 = purse1.map((item) => item * -1);
-    
-    // dp
-    let [dp1, dp2] = [new Array(sequence.length), new Array(sequence.length)];
-
-    dp1[0] = sequence[0] * purse1[0];
-    dp2[0] = sequence[0] * purse2[0];
+function solution(sequence) {
+    let answer = 0;
     
     /*
-        -2, 3, 6, 1, 3
-        
-        if dp[x-1] < 0 :
-            dp[x] = sequence[x] * purse[x]
-        else :
-            dp[x] = dp[x - 1] + sequence * purse[x]
+    
+    펄스 수열 [1, -1, 1, -1] or [-1, 1, -1, 1]
+    연속 부분 수열 x 펄스 수열 = 연속 펄스 부분 수열
+
+    합을 누적하면서, 합이 음수가 되는 시점은 최대가 될 수 없는 경우이므로, 0으로 초기화.
+    합이 양수인 시점에는 최댓값 갱신
     */
+    const LEN = sequence.length;
+    let [se1, se2] = [[...sequence], [...sequence]];
     
-    sequence.forEach((item, idx) => {
-        if(idx === 0) return;
-        
-        curValue = item * purse1[idx];
-        
-        if(dp1[idx - 1] < 0) {
-            dp1[idx] = curValue;
-            return;
+    se1 = se1.map((item, idx) => idx % 2 === 1 ? item * -1 : item);
+    se2 = se2.map((item, idx) => idx % 2 === 0 ? item * -1 : item);
+    
+    let max = -Infinity;
+    let sum = 0;
+    
+    for(const num of se1) {
+        if(sum + num < 0) {
+            sum = 0;
+            continue;
         }
         
-        dp1[idx] = dp1[idx - 1] + curValue;
-    })
+        sum += num;
+        max = Math.max(max, sum);
+    }
     
-   
-    sequence.forEach((item, idx) => {
-        if(idx === 0) return;
-        
-        curValue = item * purse2[idx];
-        
-        if(dp2[idx - 1] < 0) {
-            dp2[idx] = curValue;
-            return;
+    sum = 0;
+    
+    for(const num of se2) {
+        if(sum + num < 0) {
+            sum = 0;
+            continue;
         }
         
-        dp2[idx] = dp2[idx - 1] + curValue;
-    })
+        sum += num;
+        max = Math.max(max, sum);
+    }
     
-    const max1 = dp1.reduce((acc, val) => Math.max(acc,val) , -Infinity);
-    const max2 = dp2.reduce((acc, val) => Math.max(acc,val) , -Infinity);
-    
-    return Math.max(max1, max2);
+    return max;
 }
