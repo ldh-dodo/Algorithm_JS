@@ -1,32 +1,21 @@
 function solution(n, times) {
-    /*
-    기능 정리
-    1. n명이 입국심사를 하고, 각 입국심사대의 심사관의 심사 시간은 다를 수 있다.
-    2. 한 심사대에서 한 명만 심사할 수 있다.
-    3. 처음에 모든 심사대는 비어있다.
-    4. 가장 앞에 서있는 사람은 비어있는 심사대로 가거나, 더 빨리 끝나는 심사대로 간다.
-    5. 모든 사람이 심사를 받는데 걸리는 시간의 최솟값을 구하라
+    // 입국심사를 기다리는 사람과, 걸리는 시간의 범위가 크니, 이분탐색을 이용하자
+    // 이분 탐색 대상 : 총 걸리는 시간
     
-    입력 요구사항
-    1. 입국 심사를 기다리는 사람은 1명 이상 10억명 이하이다.
-    2. 심사관의 심사 시간은 1분 이상 10억분 이하이다.
-    3. 심사관은 1명 이상 10만명 이하이다.
-    */
+    // 가장 최적의 시간에 모든 사람이 심사를 마치기 위한 조건
+    // 몫의 합이 n과 같아야 함
     
+    let answer = 0;
     let left = 1;
-    let right = Math.max(...times) * n;
+    let right = 1000000000 * times.length;
     
     while(left <= right) {
         let mid = Math.floor((left + right) / 2);
+        let pCnt = times.reduce((acc, cur) => acc + Math.floor(mid / cur), 0);
         
-        let totalPeopleCnt = times.reduce((acc, time) => 
-                                         acc + Math.floor(mid / time), 0);
-        
-        if(totalPeopleCnt < n) {
-            left = mid + 1;
-            continue;
-        }
-        right = mid - 1;
+        if(pCnt >= n) right = mid - 1;
+        else left = mid + 1;
     }
+    
     return left;
 }
