@@ -1,46 +1,39 @@
 function solution(board) {
-    // 방향을 값으로 표현. 0/1/2/3 : 상/하/좌/우
+    // 모든 도로는 100원
+    // 이전 도로와 직각(코너 도로) 였다면, 500원 추가
     
-    const dir = [ 
-        [-1,0],
-        [1,0],
-        [0,-1],
-        [0,1],
-    ];
+    // 0, 1, 2, 3 -> 상 하 좌 우
+    let answer = [];
+    let dy = [-1, 1, 0, 0];
+    let dx = [0, 0, -1, 1];
+        
+    let N = board.length;
+    let cost = new Array(N).fill().map(() => new Array(N).fill().map(() => new Array(4).fill(Infinity)));
+
+    let q = [];
     
-    const len = board.length;
-    const dp = Array(len).fill().map(() => Array(len).fill().map(() => Array(4).fill(Infinity)));
-    // [y, x, dir]
-    
-    const q = [
-        [0, 0, 0, 3],
-        [0, 0, 0, 1],
-    ];
-    // [y, x, cost, dir]
-    
-    const isValid = 
-        (y, x) => y >= 0 && x >= 0 
-                    && y < len && x < len 
-                    && board[y][x] != 1;
+    if(board[0][1] !== 1) q.push([0, 0, 0, 3]); // [y, x, cost, dir]
+    if(board[1][0] !== 1) q.push([0, 0, 0, 1]);
     
     while(q.length > 0) {
-        const [y, x, curCost, curDirection] = q.shift();
+        const [cy, cx, curCost, curDir] = q.shift();
         
-        for(let nextDirection = 0; nextDirection < dir.length; nextDirection++) {
-            let [dy, dx] = dir[nextDirection];
-            let [ny, nx] = [y + dy, x + dx];
+        for(let i = 0; i < 4; i++) {
+            const ny = cy + dy[i];
+            const nx = cx + dx[i];
             
-            if(!isValid(ny, nx)) continue;
+            if(ny < 0 || nx < 0 || ny >= N || nx >= N) continue;
+            if(board[ny][nx] === 1) continue;
             
             let nextCost = curCost + 100;
             
-            if(curDirection !== nextDirection) nextCost += 500;
-            if(nextCost >= dp[ny][nx][nextDirection]) continue;
+            if(i !== curDir) nextCost += 500;
+            if(nextCost >= cost[ny][nx][i]) continue;
             
-            dp[ny][nx][nextDirection] = nextCost;
-            q.push([ny, nx, nextCost, nextDirection]);
+            cost[ny][nx][i] = nextCost;
+            q.push([ny, nx, nextCost, i]);
         }
     }
     
-    return Math.min(...dp[len-1][len-1]);
+    return Math.min(...cost[N-1][N-1]);
 }
