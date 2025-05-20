@@ -1,50 +1,54 @@
-/*
-    *rule
-    - 모든 판매원은 판매 이익에서 10%를 추천인에게 배분해야함.
-    - 남은 돈은 본인이 가질 수 있음.
-    - 따라서 판매원의 이익 = 자신의 칫솔 판매 이익 + 추천인에게 받는 이익
-    - 10%를 계산한 금액은 내림으로 계산
-    - 자신의 추천인에게서 발생하는 수익을 한 번에 더해서 10%를 공제하는 방식이 아니라, 각 추천인에게서 10%씩 공제해야함.
-    - 칫솔 한 개 판매액 : 100원
-*/
 function solution(enroll, referral, seller, amount) {
-    function bottomUpReferral (obj, name, profit) {
-        // bottom to up 레퍼럴 수익 정산    
-        const nextReferral = obj[name].referral;
-        
-        // 판매액에서 10% 공제하고 자신의 cost에 추가
-        const nextProfit = Math.floor(profit * 0.1);
-        const myProfit = profit - nextProfit;
-        
-        obj[name].profit += myProfit;
-        
-        if(nextReferral === '-') return;
-        if(nextProfit < 1) return;
-        
-        bottomUpReferral(obj, nextReferral, nextProfit);
-    }
+    /*
+    자신이 물건을 팔면, 자신의 추천인에게 10%의 지분이 간다.
+    칫솔 판매 금액은 100원
     
-    const PRICE_PER = 100;
+    enroll : 구성원 이름
+    referral :  추천인 이름
+    seller : 판매자 이름
+    amount : 판매 개수
+    
+    0. enroll과 referral 배열을 통해, 추천인 hash와 판매금액 hash를 생성한다.
+    1. seller을 순회하면서, 자신의 판매 금액과, 추천인의 판매 금액을 갱신한다.
+    */
+    const UNIT_PRICE = 100;
+    const CENTER = "CENTER";
+    
     let answer = [];
-    let enrollObj = {};
+    
+    let refMap = new Map();
+    let profitMap = new Map();
     
     enroll.forEach((name, idx) => {
-        let tempObj = {
-            profit: 0,
-            referral: referral[idx],
-        }
+        const ref = referral[idx];
         
-        enrollObj[name] = tempObj;
+        refMap.set(name, ref === '-' ? CENTER : ref);
+        profitMap.set(name, 0);
     });
     
-    for(let i = 0; i < amount.length; i++) {
-        const profit = amount[i] * PRICE_PER;
-        const curSeller = seller[i];
+    seller.forEach((name, idx) => {
+        let refName = refMap.get(name);
+        let curName = name;
+        let totalRev = amount[idx] * UNIT_PRICE;
         
-        bottomUpReferral(enrollObj, curSeller, profit);
-    }
+        while(curName !== CENTER) {          
+            let myRev =  totalRev - (totalRev * 0.1 < 1 ? 0 : parseInt(totalRev * 0.1));  
+            let refRev = totalRev - myRev;
+            
+
+            profitMap.set(curName, profitMap.get(curName) + myRev);
+        
+            if(refRev === 0) break;
+            
+            curName = refName;
+            refName = refMap.get(curName);
+            totalRev = refRev;
+        }       
+    });
     
-    answer = enroll.map((seller) => enrollObj[seller].profit);
+    for(const name of enroll) {
+        answer.push(profitMap.get(name));
+    }
     
     return answer;
 }
