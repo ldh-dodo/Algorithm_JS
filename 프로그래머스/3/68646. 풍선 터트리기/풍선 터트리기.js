@@ -1,49 +1,44 @@
 function solution(a) {
     /*
-    일렬로 나열된 서로 다른 숫자가 써진 풍선이 n개 있고, 한 개만 남을 때까지 규칙에 맞게 터뜨린다.
+    풍선의 숫자는 모두 다름
+    풍선을 규칙에 따라 1개만 남을 때까지 터트리려고 함.
     
     규칙
+    1. 인접한 풍선을 고르고, 두 풍선 중 하나를 터뜨린다.
+    2. 빈공간이 생겼다면, 밀착시킨다.
+    3. 인접한 두 풍선 중에서 번호가 더 작은 풍선을 터트리는건 최대 1번만 할 수 있다.
     
-    1. 임의의 인접한 두 풍선을 고른 뒤, 두 풍선 중 하나를 터뜨림
-    2. 풍선이 터진 이후 풍선 사이 빈 공간이 생기면 서로 밀착시킨다.
+    최후까지 남기는 것이 가능한 풍선들의 개수를 구하라.
     
-    특별 규칙
-    - 단 한번만 번호가 더 작은 풍선을 터뜨릴 수 있고, 이 기회를 소진하면 번호가 더 큰 풍선만을 터뜨릴 수 있다.
+    풀이 전략
+    더 작은 풍선을 터뜨리는 순간, 마지막에 남는 값은 남은 값 중 가장 작은 값
     
-    반환값
-    - 최후까지 남기는 것이 가능한 풍선들의 개수
-    
+    왼쪽 -> 오른쪽
+    오른쪽 -> 왼쪽으로 최소값을 저장한다.
+    전체 최소가 아니더라도, 다른 최소가 나왔을 때 그 풍선을 터뜨린다면 그 풍선은 마지막에 남을 수 있음.
+    최소값에 포함된 set의 개수가 정답
     */
     
-    let answer = 0;
+    let answer = new Set();
+    const len = a.length;
+    let leftToRMIN = new Array(len);
+    let rightToLMIN = new Array(len);
     
-    let len = a.length;
-    let [leftMin, rightMin] = [Array(len), Array(len)];
+    leftToRMIN[0] = a[0];
+    rightToLMIN[len - 1] = a[len - 1];
     
-    a.forEach((item, idx) => {
-        if(idx === 0) {
-            leftMin[0] = a[0];
-            return;
-        }
+    answer.add(a[0]);
+    answer.add(a[len - 1]);
+    
+    for(let i = 1; i < len; i++) {
+        let rIdx = len - i - 1;
         
-        leftMin[idx] = Math.min(item, leftMin[idx - 1]);
-    });
-    
-    a.reduceRight((_, item, idx) => {
-        if(idx === len - 1) {
-            rightMin[len - 1] = a[len - 1];
-            return;
-        }
+        leftToRMIN[i] = Math.min(leftToRMIN[i - 1], a[i]);
+        rightToLMIN[rIdx] = Math.min(rightToLMIN[rIdx + 1], a[rIdx]);
         
-        rightMin[idx] = Math.min(item, rightMin[idx + 1]);
-    }, null);
+        answer.add(leftToRMIN[i]);
+        answer.add(rightToLMIN[rIdx]);
+    }
     
-    
-    a.forEach((item, idx) => {
-        if(item > leftMin[idx] && item > rightMin[idx]) return;
-        
-        answer++;
-    })
-    
-    return answer;
+    return answer.size;
 }
