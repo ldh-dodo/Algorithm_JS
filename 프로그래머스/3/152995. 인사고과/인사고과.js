@@ -1,47 +1,38 @@
 function solution(scores) {
-    /* 
-        - 각 사원은 [근무 태도 점수, 동료 평가 점수]를 가진다.
-        - 어떤 사원이 다른 사원보다 두 점수가 모두 낮은 경우가 존재하면 인센티브 대상에서 제외
-        - 인센티브 대상인 사원들에 대해, 두 점수의 합이 높은 순으로 석차를 낸다.
-        - 점수가 동일하면 동석차이다.
-        - 동석차의 수만큼 다음 석차는 건너뛴다.
+    // 각 사원은 [근무 태도 점수, 동료 평가 점수] 를 가짐
+    // 어떤 사원이 다른 사원보다 두 점수가 모두 낮은 경우가 한 번이라도 있다면 인센티브 X
+    // 그렇지 않은 인원들은 두 점수의 합이 높은 순으로 석차를 내어 인센티브 차등 지급
+    // 합이 동일하면 동석차, 동 석차의 수만큼 다음 석차는 건너 뜀
+    // 1번째 사원인 완호의 석차를 구하라
+    
+    /*
+    인센티브를 받지 못하는 사람을 식별해야함.
+    
+    1. 근무 태도 점수 내림차순으로 정렬하되, 같다면 역시 동료 평가 점수 오름차순으로 정렬한다.
+    2. 뒤의 인원은 앞의 인원보다 근무 점수가 작거나 같으므로, 동료 점수마저 작다면, 인센티브 대상에서 제외
+    앞에서 뒤로 순회하며, 최대 동료 평가 점수를 저장해두고, 그것보다 작다면 인센티브 대상에서 제외됨.
+    3. 인센티브 대상이, 완호의 합보다 크다면, 완호의 등수를 +1 한다.
     */
+    const wanho = scores[0];
+    const wanhoSum = wanho[0] + wanho[1];
+    let wanhoRank = 1;
+    let maxColleagueScore = 0;
     
-    let len = scores.length;
-    let isEligible = Array(scores.length).fill(true);
+    scores.sort((a, b) => a[0] === b[0] ? a[1] - b[1] : b[0] - a[0]);
     
-    function setIsEligibleArray() {
-       let sortedScores = scores.map((score, idx) => [...score, idx]).sort(
-           (a,b) => b[0] === a[0] ? a[1] - b[1] : b[0] - a[0]);
+    for(let i = 0; i < scores.length; i++) {
+        const cScore = scores[i][1];
+        const curSum = scores[i][0] + cScore;
         
-        let maxPeerScore = sortedScores[0][1];
-
-        for(let i = 1; i < len; i++) {
-            const curPeerScore = sortedScores[i][1];
-            
-            if (maxPeerScore > curPeerScore) {
-                 isEligible[sortedScores[i][2]] = false;
-                continue;
+        if(cScore < maxColleagueScore) {
+            if(wanho[0] === scores[i][0] && wanho[1] === scores[i][1]) {
+                return -1;
             }
-            
-            maxPeerScore = curPeerScore;
+        } else {
+            maxColleagueScore = Math.max(maxColleagueScore, cScore);
+            if(curSum > wanhoSum) wanhoRank++;
         }
     }
     
-    setIsEligibleArray();
-    
-    if(!isEligible[0]) return -1;
-
-    let wanhoTotalScore = scores[0][0] + scores[0][1];
-    let rank = 1;
-   
-    for(let i = 1; i < len; i++) {
-        if(!isEligible[i]) continue;
-        
-        const totalScore = scores[i][0] + scores[i][1];
-        
-        if(wanhoTotalScore < totalScore) rank++;
-    }
-    
-    return rank;
+    return wanhoRank;
 }
