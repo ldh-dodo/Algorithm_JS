@@ -1,36 +1,44 @@
 function solution(n, s, a, b, fares) {
-    let answer = 0;
+    /*
+    무지는 어피치와 합승이 가능함
     
-    let floydArr = Array(n + 1).fill().map(() => Array(n + 1).fill(Infinity));
+    두 사람이 모두 귀가하는 데 소요되는 예상 최저 택시요금이 얼마인지 계산
+    
+    n : 지점 갯수
+    s : 출발 지점
+    a : a의 도착 지점
+    b : b의 도착 지점
+    fares [c, d, f] 
+        c d 사이 택시 요금이 f원
+    */
+    
+    
+    let answer = Infinity;
+    let floyd = new Array(n + 1).fill().map(() => new Array(n + 1).fill(Infinity));
+    
+    for(const [u, v, cost] of fares) {
+        floyd[u][v] = cost;
+        floyd[v][u] = cost;
+    }
     
     for(let i = 1; i <= n; i++) {
         for(let j = 1; j <= n; j++) {
-            if(i === j) floydArr[i][j] = 0;
+            if(i === j) floyd[i][j] = 0;
         }
     }
-    
-    fares.forEach(([depart, dest, cost]) => {
-        floydArr[depart][dest] = cost;
-        floydArr[dest][depart] = cost;
-    })
     
     for(let k = 1; k <= n; k++) {
         for(let i = 1; i <= n; i++) {
             for(let j = 1; j <= n; j++) {
-                floydArr[i][j] = Math.min(floydArr[i][j], 
-                                          floydArr[i][k] + floydArr[k][j]);
+                if(floyd[i][k] + floyd[j][k] < floyd[i][j]) {
+                    floyd[i][j] = floyd[i][k] + floyd[j][k];
+                }
             }
         }
     }
-    answer = floydArr[s][a] + floydArr[s][b]; // 처음엔 합승하지 않은 금액으로 초기화
     
-    for(let k = 1; k <= n; k++) {
-        // 경유지 거쳤을 때 최솟값 갱신
-        
-        answer = Math.min(
-            answer, 
-            floydArr[s][k] + floydArr[k][a] + floydArr[k][b]
-        );
+    for(let k = 1; k <=n; k++) {
+        answer = Math.min(answer, floyd[s][k] + floyd[k][a] + floyd[k][b]);
     }
     
     return answer;
