@@ -1,83 +1,107 @@
 function solution(commands) {
-    const answer = [];
-    const LEN = 2500;
-    const cell = Array(LEN).fill(null);
-    const p = Array(LEN).fill(0).map((_, i) => i);
-    const parseCoord = (r, c) => (parseInt(r) - 1) * 50 + (parseInt(c) - 1);
-
+    /*
+    표 크기 : 50 x 50
+    
+    - 모든 좌표 값은 이차원이 아닌, 1차원 배열로 변환하여 사용한다.
+    - disjoint set 이용
+    
+    updateCell : 해당 좌표의 root 값을 value로 바꾼다.
+    updateValue : 모든 좌표값을 순회하며 해당 값을 가진 좌표를 목표 값으로 바꾼다.
+    merge : 같은 set 안에 집어넣는다
+    unmerge : 모든 좌표값을 순회하며 해당 좌표의 root값과 같은 root 값을 가지는 좌표들을 초기값으로 초기화
+    print : 해당 좌표의 root 값을 출력한다.
+    */
+    let answer = [];
+    const LEN = 50 * 50 + 1;
+    const cell = new Array(LEN).fill(null);
+    const p = new Array(LEN).fill().map((_, idx) => idx); // makeSet은 해당 구문으로 대체
+    
+    const parseCoord = (u, v) => {
+        [u, v] = [Number(u), Number(v)];
+        
+        return ((u - 1) * 50) + v;
+    }
+    
     for(const command of commands) {
         const com = command.split(' ');
         
-        switch(com[0]) {
-            case "UPDATE":
-                if(com.length === 4) update(parseCoord(com[1], com[2]), com[3]);
-                else replace(com[1], com[2]);
+        switch(com[0]){
+            case 'UPDATE' :
+                update(com);
                 break;
-            case "MERGE":
-                union(parseCoord(com[1], com[2]), parseCoord(com[3], com[4]));
+            case 'MERGE' :
+                merge(com);
                 break;
-            case "UNMERGE":
-                unmerge(parseCoord(com[1], com[2]));
+            case 'UNMERGE' :
+                unmerge(com);
                 break;
-            case "PRINT":
-                print(parseCoord(com[1], com[2]));
-                break;  
+            case 'PRINT' :
+                print(com);
+                break;
         }
     }
     
-    function update(u, value) {
-        const parentIdx = findSet(u);
-        cell[parentIdx] = value;
+    function update(command) {
+        if(command[3] !== undefined) updateCell(command);
+        else updateValue(command);
     }
     
-    function replace(value1, value2) {
+    function updateCell([, r, c, val]) {
+        cell[findSet(parseCoord(r, c))] = val;
+    }
+    
+    function updateValue([, val1, val2]) {
         for(let i = 0; i < LEN; i++) {
-            if(cell[i] === value1) cell[i] = value2;
+            if(cell[i] === val1) cell[i] = val2;
         }
     }
     
+    function merge([, r1, c1, r2, c2]) {        
+        union(parseCoord(r1, c1), parseCoord(r2, c2));
+    }
     
-    function unmerge(u) {
-        const targetRoot = findSet(u);
-        const targetValue = cell[targetRoot];
-        const group = [];
+    function unmerge([, r, c]) {
+        const curCoord = parseCoord(r, c);
+        const root = findSet(curCoord);
+        const rollbackItem = cell[root];
+        const unmergeGroup = [];
         
         for(let i = 0; i < LEN; i++) {
-            const curRoot = findSet(i);
-            
-            if(curRoot === targetRoot) 
-                group.push(i);
+            if(root === findSet(i)) unmergeGroup.push(i);
         }
         
-        for(const idx of group) {
+        for(const idx of unmergeGroup) {
             p[idx] = idx;
             cell[idx] = null;
         }
         
-        cell[u] = targetValue;
+        if(rollbackItem !== null) {
+            cell[curCoord] = rollbackItem;
+        }
     }
     
-    function print(u) {
-        answer.push(cell[findSet(u)] ?? "EMPTY");
+    function print([, r, c]) {
+        const value = cell[findSet(parseCoord(r, c))];
+        
+        answer.push(value ?? 'EMPTY');
     }
+    
+    // disjoint set
     
     function findSet(u) {
-        if(u !== p[u]) p[u] = findSet(p[u]);
+        if(p[u] !== u) p[u] = findSet(p[u]);
+        
         return p[u];
     }
     
     function union(u, v) {
-        const uRoot = findSet(u);
-        const vRoot = findSet(v);
+        const [uRoot, vRoot] = [findSet(u), findSet(v)];
         
         if(uRoot === vRoot) return;
         
-        if(cell[uRoot] === null && cell[vRoot] !== null) {
-            p[uRoot] = vRoot;
-        } else {
-            p[vRoot] = uRoot;
-        }
-    }    
-        
+        if(cell[vRoot] !== null && cell[uRoot] === null) p[uRoot] = vRoot;
+        else p[vRoot] = uRoot;
+    }
+    
     return answer;
 }
