@@ -1,50 +1,44 @@
 function solution(alp, cop, problems) {
     /*
-        - 문제의 요구치 이상의 알고력과 코딩력이 되어야 문제를 풀 수 있음
+        알고력, 코딩력 >= 0
+        문제를 풀기위해 알고력과 코딩력이 필요함
         
-        알고력 코딩력 높이는 방법 
-        공부
-        - 알고력 1을 높이는데 1의 시간
-        - 코딩력 1을 높이는데 1의 시간
-        문제 풀이
-        - 풀 수 있는 문제를 풀기.(문제마다 오르는 알고력과 코딩력이 정해짐, 반복 풀이 가능)
+        특정 문제가 요구하는 알고력과 코딩력 중 하나라도 부족하면 문제를 풀 수 없음
         
-        모든 문제들을 풀 수 있는 알고력과 코딩력을 얻는 최단시간 구하기
-    */
-    /* 
-        단순하게 그리디로 접근해서는 안될듯
-        만약, 초기 요구치가 높지만, 알고력과 코딩력을 많이 보상하는 문제라면, 공부에 시간을 많이 쏟고 
-        그 문제를 풂으로써, 시간을 단축시킬 수도 있음.
+        - 알고력과 코딩력을 높이는 두 가지 방법
+        1의 시간을 사용하면 알고력 또는 코딩력을 높일 수 있음
+        풀 수 있는 문제 중 하나를 풀어, 문제가 보상하는 알고력과 코딩력을 높일 수 있음
         
-        결국 dp로 모든 케이스를 다 봐야할듯
+        모든 문제들을 풀 수 있는 알고력과 코딩력을 얻는 최단시간을 구하려고 한다.
+        
+        
     */
     
-    let [maxAlp, maxCop] = [alp, cop];
-    for(const [alp, cop] of problems) {
-        maxAlp = Math.max(maxAlp, alp);
-        maxCop = Math.max(maxCop, cop);
+    let [maxAl, maxCo] = [alp, cop];
+    for(const [al, co] of problems) {
+        maxAl = Math.max(maxAl, al);
+        maxCo = Math.max(maxCo, co);
     }
     
-    let dp = Array.from({length : maxAlp + 1}, () => Array.from({length : maxCop + 1}, () => Infinity));
-
+    const dp = new Array(maxAl + 1).fill().map(() => new Array(maxCo + 1).fill(Infinity));
     dp[alp][cop] = 0;
     
-    for(let i = alp; i <= maxAlp; i++) {
-        for(let j = cop; j <= maxCop; j++) {
-            if(i < maxAlp) dp[i + 1][j] = Math.min(dp[i + 1][j], dp[i][j] + 1);
-            if(j < maxCop) dp[i][j + 1] = Math.min(dp[i][j + 1], dp[i][j] + 1);
-            if(i === maxAlp && j === maxCop) break;
+    for(let i = alp; i <= maxAl; i++) {
+        for(let j = cop; j <= maxCo; j++) {
+            if(i < maxAl) dp[i + 1][j] = Math.min(dp[i + 1][j], dp[i][j] + 1);
+            if(j < maxCo) dp[i][j + 1] = Math.min(dp[i][j + 1], dp[i][j] + 1);
+            if(i === maxAl && j === maxCo) break;
             
-            for(const [alpReq, copReq, alpRwd, copRwd, cost] of problems) {
-                if(i < alpReq || j < copReq) continue;
+            for(const [alReq, coReq, alRwd, coRwd, cost] of problems) {
+                if(i < alReq || j < coReq) continue;
                 
-                let curAlp = (i + alpRwd > maxAlp) ? maxAlp : i + alpRwd;
-                let curCop = (j + copRwd > maxCop) ? maxCop : j + copRwd;
+                const curAl = (i + alRwd > maxAl) ? maxAl : i + alRwd;
+                const curCo = (j + coRwd > maxCo) ? maxCo : j + coRwd;
                 
-                dp[curAlp][curCop] = Math.min(dp[curAlp][curCop], dp[i][j] + cost);
-            }
+                dp[curAl][curCo] = Math.min(dp[curAl][curCo], dp[i][j] + cost);
+            } 
         }
     }
     
-    return dp[maxAlp][maxCop];
+    return dp[maxAl][maxCo];
 }
