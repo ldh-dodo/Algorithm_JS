@@ -1,35 +1,29 @@
 function solution(n, computers) {
-    let graph = Array.from({length : n}, () => []);
-    let visited = Array.from({length : n}, () => false);
-    let cnt = 0;
+    let answer = 0;
+    const visited = Array(n).fill(false);
     
-    computers.forEach((computer, i) => {
-        computer.forEach((target, j) => {
-            if(i === j || target === 0) return;
-        
-            graph[i].push(j);
-        });
-    });
     
     for(let i = 0; i < n; i++) {
         if(visited[i]) continue;
-        
-        cnt++;
-        let q = [i];
+            
+        answer++;
+        const q = [i];
         visited[i] = true;
         
-        while(q.length > 0) {
-            const cur = q.shift();
+        let head = 0;
+        while(head < q.length) {
+            const cur = q[head++];
             
-            for(const next of graph[cur]) {
-                if(visited[next]) continue;
-                
-                visited[next] = true;
-                q.push(next);
-            }
+            computers[cur].forEach((isConnected, node) => {
+                if(!visited[node] && isConnected === 1) {
+                    visited[node] = true;
+                    q.push(node);
+                }
+            });
         }
+        
     }
     
-    return cnt;
+    return answer;
 }
-// 2
+
