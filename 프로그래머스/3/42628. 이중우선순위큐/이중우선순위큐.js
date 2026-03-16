@@ -1,121 +1,94 @@
-function solution(operations) {
-    let pq = new MinHeap();
-    
-    for(const operation of operations) {
-        let [op, num] = operation.split(' ');
-        let isDeleteMin = false;
-        num = parseInt(num);
-        
-        if(op === 'I') {
-            pq.insert(num);
-        } else if(op === 'D') {
-            pq.remove(num === 1);
-        }
-    }
-
-    return pq.returnResult();
-}
-
 class MinHeap {
     constructor() {
         this.heap = [];
     }
     
-    isEmpty() {
-        return this.heap.length === 0;
+    size() {
+        return this.heap.length;
     }
     
-    getParentIndex(i) {
-        return Math.floor((i - 1) / 2);
-    }
-    
-    getLeftChildIndex(i) {
-        return 2 * i + 1;
-    }
-
-    getRightChildIndex(i) {
-        return 2 * i + 2;
-    }
-    
-    swap(idx1, idx2) {
-        [this.heap[idx1], this.heap[idx2]] = [this.heap[idx2], this.heap[idx1]];
-    }
-    
-    heapifyUp() {
-        let currentIndex = this.heap.length - 1;
-        
-        while(currentIndex > 0) {
-            let parentIndex = this.getParentIndex(currentIndex);
-            
-            if(this.heap[currentIndex] >= this.heap[parentIndex]) break;
-            
-            this.swap(currentIndex, parentIndex);
-            currentIndex = parentIndex;
-        }
-    }
-    
-    heapifyDown() {
-        let currentIndex = 0;
-        
-        while(this.getLeftChildIndex(currentIndex) < this.heap.length) {
-            let smallerChildIndex = this.getLeftChildIndex(currentIndex);
-            let rightChildIndex = this.getRightChildIndex(currentIndex);
-            
-            if(rightChildIndex < this.heap.length &&
-              this.heap[rightChildIndex] < this.heap[smallerChildIndex]) {
-                smallerChildIndex = rightChildIndex;
-            }
-            
-            if(this.heap[currentIndex] <= this.heap[smallerChildIndex]) break;
-            
-            this.swap(currentIndex, smallerChildIndex);
-            currentIndex = smallerChildIndex;   
-        }
-    }
-    
-    insert(val) {
+    push(val) {
         this.heap.push(val);
-        this.heapifyUp();
+        let i = this.heap.length - 1;
+        
+        while(i > 0) {
+            const parent = (i - 1) >> 1;
+            
+            if(this.heap[parent] <= this.heap[i]) break;
+            [this.heap[parent], this.heap[i]] = [this.heap[i], this.heap[parent]];
+            
+            i = parent;
+        }
     }
     
-    remove(isDeleteMax) {
-        if(this.isEmpty()) {
-            return null;
-        }
-        
-        if(isDeleteMax) {
-            const parentIndex = this.getParentIndex(this.heap.length - 1);
-            const lastLeafNodes = this.heap.slice(parentIndex + 1);
-            
-            let maxIndex = 0;
-
-            for(let i = 1; i < lastLeafNodes.length; i++) {
-                if(lastLeafNodes[i] > lastLeafNodes[maxIndex]) maxIndex = i;
-            }
-            
-            this.swap(parentIndex + 1 + maxIndex, this.heap.length - 1);
-            return this.heap.pop();
-        }
-        
-        let min = this.heap[0];
-        let last = this.heap.pop();
-        
-        if(!this.isEmpty()) {
-            this.heap[0] = last;
-            this.heapifyDown();
-        }
-        
-        return min;
+    peek() {
+        return this.heap[0];
     }
     
-    returnResult() {
-        if(this.isEmpty()) return [0,0];
-        if(this.heap.length === 1) return [this.heap[0], this.heap[0]];
+    pop() {
+        if(this.heap.length === 1) return this.heap.pop();
         
-        let parentIndex = this.getParentIndex(this.heap.length - 1);
-        let lastLeafNodes = this.heap.slice(parentIndex + 1);
-        let maxValue = Math.max(...lastLeafNodes);
+        const top = this.heap[0];
+        this.heap[0] = this.heap.pop();
+        let i = 0;
         
-        return [maxValue, this.heap[0]];
+        while(true) {
+            let smallest = i;
+            const left = 2 * i + 1;
+            const right = 2 * i + 2;
+            
+            if(left < this.heap.length && this.heap[left] < this.heap[smallest]) 
+                smallest = left;
+            if(right < this.heap.length && this.heap[right] < this.heap[smallest])
+                smallest = right;
+            if(smallest === i) break;
+            
+            [this.heap[smallest], this.heap[i]] = [this.heap[i], this.heap[smallest]];
+            i = smallest;
+        }
+        
+        return top;
     }
 }
+
+function solution(operations) {
+    /*
+    MinHeap으로 정렬해두고, 
+    최소 값은 root값을, 
+    최대값은 마지막 level에 있는 걸 활용
+    */
+    
+    const pq = new MinHeap();
+    
+    for(const [op, str] of operations.map((line) => line.split(' '))) {
+        if(op === 'I') {
+            pq.push(Number(str));
+        } else if(op === 'D') {
+            if(pq.size() === 0) continue;
+            
+            if(str === '-1') {
+                pq.pop();
+            } else {
+                const lastIdx = pq.size() - 1;
+                const parentIdx = (lastIdx - 1) >> 1;
+                const lastArr = pq.heap.slice(parentIdx + 1);
+                let maxIdx;
+                let max = -Infinity;
+                
+                for(let i = 0; i < lastArr.length; i++) {
+                    if(lastArr[i] > max) {
+                        maxIdx = parentIdx + 1 + i;
+                        max = lastArr[i];
+                    }
+                }
+                
+                [pq.heap[lastIdx], pq.heap[maxIdx]] = [pq.heap[maxIdx], pq.heap[lastIdx]];
+                pq.heap.pop();
+            }
+        }
+    }
+    
+    if(pq.size() === 0) return [0, 0];
+    
+    return [Math.max(...pq.heap.slice(((pq.size() - 2) >> 1) + 1)), pq.peek()];
+}   
