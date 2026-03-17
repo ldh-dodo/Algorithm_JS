@@ -9,7 +9,6 @@ function solution(A, B) {
     A팀 순서 공개 -> B팀이 승점 높이는 방법으로 출전 순서 정해야 함. 이 때 B팀이 얻는 승점
     
     전략: 가장 적은 B로 A를 이겨라
-
     */
     const N = A.length;
     A.sort((a, b) => a - b);
