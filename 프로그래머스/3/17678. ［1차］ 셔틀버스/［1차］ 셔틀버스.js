@@ -1,61 +1,55 @@
 function solution(n, t, m, timetable) {
     /*
-    셔틀은 09:00부터 총 n회 t분 간격으로 역에 도착.
-    최대 m명의 승객을 태울 수 있음
+    셔틀은 09:00부터 총 n 회 t 분 간격으로 '역에 도착'
+    최대 m 명 승객
     
-    콘이 셔틀을 타고 사무실로 가라 수 있는 도착 시각 중 제일 늦은 시각
-    콘은 대기열에서 제일 뒤에 섬
+    역에 도착한 순간, 대기 순서대로 태우고 바로 출발
     
-    timetable HH:MM 형식
+    콘이 셔틀을 타고 사무실로 갈 수 있는 도착 시각 중 제일 늦은 시각을 구하라
+    콘은 같은 시각에 도착한 크루 중 가장 뒤에선다.
+    */
     
-    콘은 반드시 (09:00 ~ 마지막으로 셔틀이 역에 도착하는 시간) 사이에는 와야 한다.
+    const secTable = timetable.map(timeToSec).sort((a, b) => a - b);
+    let curSec = timeToSec('09:00') - timeToSec(`00:${String(t).padStart(2, '0')}`);
     
-    만약, 해당 시간 내에 모든 인원(timetable.length + 1)이 셔틀을 탈 수 있으면, 마지막으로 셔틀이 역에 도착하는 시간에 오면 된다.
-    
-    만약, 모든 인원이 셔틀을 탈 수 없다면.. 콘은 가장 마지막으로 탈 수 있는 사람보다 1분 일찍 오면 됨
-    */ 
-    
-    const timeToMinutes = (time) => {
-        const [hour, minutes] = time.split(':');
+    let idx = 0;
+    let people = 0;
+    let perPeople = 0;
+    for(let k = 0; k < n; k++) {
+        if(people >= n * m) break;
         
-        return Number(hour) * 60 + Number(minutes);
-    }
-    
-    const minutesToTime = (minutes) => {
-        let hour = Math.floor(minutes / 60).toString();
-        let min = (minutes % 60).toString();
-        
-        return `${hour.padStart(2, 0)}:${min.padStart(2, 0)}`;
-    }
-
-    const MAX_PEOPLE = n * m;
-    const TOTAL_PEOPLE = timetable.length;
-    let currentTime = timeToMinutes('09:00');
-    const MAX_TIME = currentTime + ((n - 1) * t);
-
-    let peopleCnt = 0;
-    let flag = false;    
-    
-    timetable = timetable.map(timeToMinutes);
-    timetable.sort((a, b) => b - a);
-    let lastTime = null;
-    
-    for(let i = 0; i < n; i++) {
-        flag = false;
-        
-        for(let k = 0; k < m; k++) {
-            if(timetable.length === 0 || timetable[timetable.length - 1] > currentTime) break;
-
-            lastTime = timetable.pop();
-            if(peopleCnt + 1 === MAX_PEOPLE) return minutesToTime(lastTime - 1);
-            peopleCnt++;
-            
-            if(k === m - 1) flag = true;
+        curSec += timeToSec(`00:${String(t).padStart(2, '0')}`);
+        perPeople = 0;
+        console.log(curSec);
+        for(let i = 0; i < m; i++) {
+            if(secTable[idx] <= curSec) {
+                idx++;
+                people++;
+                perPeople++;
+            }
+                
+            if(people >= n * m) break;
         }
-        
-        currentTime += t;
+        /*
+        인원이 다 차는 경우가 없을 때는, 셔틀의 마지막 도착 시각
+        인원이 다 차는 경우가 있을 때는, 마지막 인원보다 1분 빨리 도착
+        */
     }
+    
+    function timeToSec(time) {
+        const [hour, minute] = time.split(':').map(Number);
+        
+        return hour * 3600 + minute * 60;
+    }
+    
+    function secToTime(sec) {
+        const hour = Math.floor(sec / 3600);
+        const min = Math.floor((sec % 3600) / 60);
+        
+        return `${String(hour).padStart(2, '0')}:${String(min).padStart(2, '0')}`;
+    }
+    
 
-    if(flag) return minutesToTime(lastTime - 1);
-    return minutesToTime(MAX_TIME);
+    if(people < n * m && perPeople < m) return secToTime(curSec);
+    return secToTime(secTable[idx - 1] - 60);
 }
