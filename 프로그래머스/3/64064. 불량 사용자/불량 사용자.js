@@ -1,28 +1,45 @@
-function solution(userIds, bannedIds) {
-    let bannedList = new Set();
+function solution(userId, bannedId) {
+    let answer = 0;
+    const result = new Set();    
     
-    bannedIds = bannedIds.map((id) => id.replaceAll('*', '.'));
-    find(0, new Set());
+    function backtracking(n) {
+        const path = new Set();
+        
+        function dfs(bannedIdx) {
+            if(path.size === n) {
+                result.add([...path].sort().join(','));
+                return;
+            }
+            
+            for(let i = 0; i < userId.length; i++) {
+                const uid = userId[i];
+                const bid = bannedId[bannedIdx];
+                
+                if(path.has(uid)) continue;
+                if(!canBan(uid, bid)) continue;
+                
+                path.add(uid);
+                dfs(bannedIdx + 1);
+                path.delete(uid);
+            }
+        }    
+        
+        dfs(0);
+        
+    }
     
-    function find(bannedIdx, list) {
-        if(bannedIdx >= bannedIds.length) {
-            bannedList.add([...list].sort().join());
+    function canBan(uid, bid) {
+        if(uid.length !== bid.length) return false;
+        
+        for(let i = 0; i < bid.length; i++) {
+            if(bid[i] === '*') continue;
+            if(uid[i] !== bid[i]) return false;
         }
         
-        for(let i = 0; i < userIds.length; i++) {
-            const [bannedId, userId] = [bannedIds[bannedIdx], userIds[i]];
-            if(!canInsert(bannedId, userId, list)) continue;
-            
-            list.add(userId);
-            find(bannedIdx + 1, list);
-            list.delete(userId);
-        }
+        return true;
     }
     
-    function canInsert(bannedId, userId, list) {
-        const regex = new RegExp(`^${bannedId}$`);
-        return !list.has(userId) && regex.test(userId);
-    }
+    backtracking(bannedId.length);
     
-    return bannedList.size;
-}
+    return result.size;
+}                            
