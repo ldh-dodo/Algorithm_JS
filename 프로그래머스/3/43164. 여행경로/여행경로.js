@@ -1,34 +1,42 @@
 function solution(tickets) {
-    const LEN = tickets.length;
-    let visited = new Array(LEN).fill(false);
-    let logs = [];
-    let answer = [];
+    /*
+    모든 공항 : 알파벳 대문자 3글자
+    3 <= 공항수 <= 10000
     
-    tickets.sort();
+    항공권 모두 사용해야함
+    경로 2개 이상일 경우, 알파벳 오름차순
+    */
     
-    dfs("ICN", 1);
+    let answer = ['ICN'];
+    const visited = Array(tickets.length).fill(false);
     
-    function dfs(cur, depth) {
-        logs.push(cur);
+    tickets.sort(((a, b) => a[1].localeCompare(b[1])));
         
-        if(depth === LEN + 1) {
-            answer = logs;
-            return true;
-        }
-        
-        for(let i = 0; i < tickets.length; i++) {
-            if(!visited[i] && tickets[i][0] === cur) {
+    backtracking(new Set(tickets).size);
+    
+    function backtracking(n) {      
+        function dfs(path, cur) {
+            if(answer.length !== 1) return;
+            if(path.length === n) {
+                answer.push(...path);
+                return;
+            }
+            
+            for(let i = 0; i < tickets.length; i++) {
+                if(visited[i]) continue;
+                if(tickets[i][0] !== cur) continue;
+                
+                const [st, end] = tickets[i];
+    
+                path.push(end);
                 visited[i] = true;
-                
-                if(dfs(tickets[i][1], depth + 1)) return true;
-                
+                dfs(path, end);
+                path.pop();
                 visited[i] = false;
             }
         }
         
-        logs.pop();
-        
-        return false;
+        dfs([], 'ICN');
     }
     
     return answer;
