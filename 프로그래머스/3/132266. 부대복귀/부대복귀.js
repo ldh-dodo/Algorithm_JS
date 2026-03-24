@@ -1,29 +1,45 @@
 function solution(n, roads, sources, destination) {
-    let answer = [];
-    const graph = new Array(n + 1).fill().map(() => []);
-    let memo = new Array(n + 1).fill(-1);
+    /*
+    지역: 유일한 번호
+    지역 이동 시간 : 1
+    최단시간에 부대로 복귀
+    
+    
+    return : []
+    
+    1 : [2, 4]
+    2 : [1, 4, 5]
+    3 : []
+    4 : [1, 2, 5]
+    5 : [2, 4]
+    */
+    
+    const dist = Array(n + 1).fill(null);
+    const graph = Array.from({length : n + 1}, () => []);
+    const answer = [];
     
     for(const [u, v] of roads) {
         graph[u].push(v);
         graph[v].push(u);
     }
     
-    let q = [destination];
-    memo[destination] = 0;
+    const q = [destination];
+    dist[destination] = 0;
     
-    while(q.length > 0) {
-        const cur = q.shift();
+    let head = 0;
+    while(head < q.length) {
+        const cur = q[head++];
         
         for(const next of graph[cur]) {
-            if(memo[next] !== -1) continue;
+            if(dist[next] !== null) continue;
             
-            memo[next] = memo[cur] + 1;
+            dist[next] = dist[cur] + 1;
             q.push(next);
         }
     }
     
-    for(const source of sources) {
-        answer.push(memo[source]);
+    for(const s of sources) {
+        answer.push(dist[s] === null ? -1 : dist[s]);
     }
     
     return answer;
