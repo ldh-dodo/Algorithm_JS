@@ -1,39 +1,53 @@
 function solution(board) {
-    // 모든 도로는 100원
-    // 이전 도로와 직각(코너 도로) 였다면, 500원 추가
+    /*
+    1: 벽
+    0: 비어있음
     
-    // 0, 1, 2, 3 -> 상 하 좌 우
-    let answer = [];
-    let dy = [-1, 1, 0, 0];
-    let dx = [0, 0, -1, 1];
-        
-    let N = board.length;
-    let cost = new Array(N).fill().map(() => new Array(N).fill().map(() => new Array(4).fill(Infinity)));
+    출발점 : (0, 0) -> 도착점 (N - 1, N - 1)
+    
+    자동차가 도착점까지 무사히 도달할 수 있게 경주로를 건설 
+    벽이 있는 칸에는 경주로 건설 불가
+    
+    직선 도로 : 100원
+    코너 추가 비용 : 500원
+    
+    dp[y][x][dir] : (y, x) 에 도달할 수 있도록 경주로를 건설했을 때의 최소 비용
+    */
+    
+    const N = board.length;
+    const dp = Array.from({length : N}, () => Array.from({length : N}, () => Array(4).fill(Infinity)));
+    
+    for(let dir = 0; dir < 4; dir++) {
+        dp[0][0][dir] = 0;
+    }
+    
+    const dy = [-1, 1, 0, 0]; // 상 하 좌 우
+    const dx = [0, 0, -1, 1];
+    
+    const q = [];  // [y, x, cost, dir]
+    
+    if(board[1][0] !== 1) q.push([0, 0, 0, 1]); // 하
+    if(board[0][1] !== 1) q.push([0, 0, 0, 3]); // 우
 
-    let q = [];
-    
-    if(board[0][1] !== 1) q.push([0, 0, 0, 3]); // [y, x, cost, dir]
-    if(board[1][0] !== 1) q.push([0, 0, 0, 1]);
-    
-    while(q.length > 0) {
-        const [cy, cx, curCost, curDir] = q.shift();
+    while(q.length) {
+        const [y, x, cost, d] = q.shift(); 
         
-        for(let i = 0; i < 4; i++) {
-            const ny = cy + dy[i];
-            const nx = cx + dx[i];
+        for(let dir = 0; dir < 4; dir++) {
+            const ny = y + dy[dir];
+            const nx = x + dx[dir];
             
             if(ny < 0 || nx < 0 || ny >= N || nx >= N) continue;
             if(board[ny][nx] === 1) continue;
             
-            let nextCost = curCost + 100;
+            let nextCost = cost + 100;
             
-            if(i !== curDir) nextCost += 500;
-            if(nextCost >= cost[ny][nx][i]) continue;
+            if(dir !== d) nextCost += 500;
+            if(nextCost >= dp[ny][nx][dir]) continue;
             
-            cost[ny][nx][i] = nextCost;
-            q.push([ny, nx, nextCost, i]);
+            dp[ny][nx][dir] = nextCost;
+            q.push([ny, nx, nextCost, dir]);
         }
     }
     
-    return Math.min(...cost[N-1][N-1]);
+    return Math.min(...dp[N - 1][N - 1]);
 }
