@@ -1,19 +1,25 @@
 function solution(n, times) {
-    // 입국심사를 기다리는 사람과, 걸리는 시간의 범위가 크니, 이분탐색을 이용하자
-    // 이분 탐색 대상 : 총 걸리는 시간
+    /*
+    n, t 최대 10억
+    O(logN) 이어야 통과 가능 -> 이분 탐색 가능성
     
-    // 가장 최적의 시간에 모든 사람이 심사를 마치기 위한 조건
-    // 몫의 합이 n과 같아야 함
+    28 / 7 -> 4
+    28 / 10 -> 2.xx 
     
-    let answer = 0;
+    몫 더했을 때 n, lowerbound
+
+    */
+    
     let left = 1;
-    let right = 1000000000 * times.length;
+    let right = n * Math.max(...times) + 1
     
-    while(left <= right) {
-        let mid = Math.floor((left + right) / 2);
-        let pCnt = times.reduce((acc, cur) => acc + Math.floor(mid / cur), 0);
+    while(left < right) {
+        const mid = Math.floor((left + right) / 2);
         
-        if(pCnt >= n) right = mid - 1;
+        let sum = times.map((time) => Math.floor(mid / time))
+                        .reduce((acc, cur) => acc + cur, 0);
+        
+        if(sum >= n) right = mid;
         else left = mid + 1;
     }
     
