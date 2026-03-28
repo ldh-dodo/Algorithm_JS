@@ -1,54 +1,30 @@
 function solution(enroll, referral, seller, amount) {
-    /*
-    자신이 물건을 팔면, 자신의 추천인에게 10%의 지분이 간다.
-    칫솔 판매 금액은 100원
+    const perPrice = 100;
     
-    enroll : 구성원 이름
-    referral :  추천인 이름
-    seller : 판매자 이름
-    amount : 판매 개수
-    
-    0. enroll과 referral 배열을 통해, 추천인 hash와 판매금액 hash를 생성한다.
-    1. seller을 순회하면서, 자신의 판매 금액과, 추천인의 판매 금액을 갱신한다.
-    */
-    const UNIT_PRICE = 100;
-    const CENTER = "CENTER";
-    
-    let answer = [];
-    
-    let refMap = new Map();
-    let profitMap = new Map();
+    const ref = {};
+    const nameToIdx = {};
+    const result = Array(enroll.length).fill(0);
     
     enroll.forEach((name, idx) => {
-        const ref = referral[idx];
-        
-        refMap.set(name, ref === '-' ? CENTER : ref);
-        profitMap.set(name, 0);
+        nameToIdx[name] = idx;
+        ref[name] = referral[idx] === '-' ? 'center' : referral[idx];
     });
     
     seller.forEach((name, idx) => {
-        let refName = refMap.get(name);
-        let curName = name;
-        let totalRev = amount[idx] * UNIT_PRICE;
+        let n = name;
+        let price = perPrice * amount[idx];
         
-        while(curName !== CENTER) {          
-            let myRev =  totalRev - (totalRev * 0.1 < 1 ? 0 : parseInt(totalRev * 0.1));  
-            let refRev = totalRev - myRev;
+        let refPrice;
+        while(n !== 'center' && price !== 0) {
+            refPrice = Math.floor(price / 10);
+            price -= refPrice;
             
-
-            profitMap.set(curName, profitMap.get(curName) + myRev);
-        
-            if(refRev === 0) break;
+            result[nameToIdx[n]] += price;
             
-            curName = refName;
-            refName = refMap.get(curName);
-            totalRev = refRev;
-        }       
+            price = refPrice;
+            n = ref[n];
+        }
     });
     
-    for(const name of enroll) {
-        answer.push(profitMap.get(name));
-    }
-    
-    return answer;
+    return result;
 }
