@@ -7,7 +7,6 @@ function solution(scores) {
     인센티브 O -> 두 점수의 합이 높은 순으로 석차
     return: 완호(idx: 0) 의 석차
     
-    
     0번으로 오름차순
 
     */
