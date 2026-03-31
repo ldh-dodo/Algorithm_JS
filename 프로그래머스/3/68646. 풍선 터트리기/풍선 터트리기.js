@@ -1,44 +1,39 @@
 function solution(a) {
     /*
-    풍선의 숫자는 모두 다름
-    풍선을 규칙에 따라 1개만 남을 때까지 터트리려고 함.
+    서로 다른 숫자 n개 풍선
+    풍선이 한 개만 남을 때까지 계속 터뜨린다
     
-    규칙
-    1. 인접한 풍선을 고르고, 두 풍선 중 하나를 터뜨린다.
-    2. 빈공간이 생겼다면, 밀착시킨다.
-    3. 인접한 두 풍선 중에서 번호가 더 작은 풍선을 터트리는건 최대 1번만 할 수 있다.
+    인접한 두 풍선 중 하나 터뜨림
+    풍선 빈 공간 -> 빈 공간 채움
+    번호가 더 작은 풍선을 터트리는 행위는 최대 1번
     
-    최후까지 남기는 것이 가능한 풍선들의 개수를 구하라.
+    return: 최후까지 남기는 것이 가능한 풍선들의 개수
     
-    풀이 전략
-    더 작은 풍선을 터뜨리는 순간, 마지막에 남는 값은 남은 값 중 가장 작은 값
+    더 작은 풍선을 터뜨린 이후 최후에 남는 풍선은, 남은 풍선 중 최댓값
     
-    왼쪽 -> 오른쪽
-    오른쪽 -> 왼쪽으로 최소값을 저장한다.
-    전체 최소가 아니더라도, 다른 최소가 나왔을 때 그 풍선을 터뜨린다면 그 풍선은 마지막에 남을 수 있음.
-    최소값에 포함된 set의 개수가 정답
-    */
+      */
+    const N = a.length;
+    const toLeftMin = Array(N);
+    const toRightMin = Array(N);
     
-    let answer = new Set();
-    const len = a.length;
-    let leftToRMIN = new Array(len);
-    let rightToLMIN = new Array(len);
+    let cnt = 0;
     
-    leftToRMIN[0] = a[0];
-    rightToLMIN[len - 1] = a[len - 1];
+    toLeftMin[N - 1] = a[N - 1];
+    toRightMin[0] = a[0];
     
-    answer.add(a[0]);
-    answer.add(a[len - 1]);
-    
-    for(let i = 1; i < len; i++) {
-        let rIdx = len - i - 1;
-        
-        leftToRMIN[i] = Math.min(leftToRMIN[i - 1], a[i]);
-        rightToLMIN[rIdx] = Math.min(rightToLMIN[rIdx + 1], a[rIdx]);
-        
-        answer.add(leftToRMIN[i]);
-        answer.add(rightToLMIN[rIdx]);
+    for(let i = 1; i < N; i++) {
+        toLeftMin[N-i-1] = Math.min(a[N-i-1], toLeftMin[N-i]);
+        toRightMin[i] = Math.min(toRightMin[i-1], a[i]);
     }
     
-    return answer.size;
+    
+    
+    for(let i = 0; i < N; i++) {
+        if(a[i] <= toLeftMin[i] || a[i] <= toRightMin[i]) cnt++;
+        // x의 왼쪽에 x보다 작은 값이 존재 -> x의 오른쪽에는 x보다 작은 값 없어야함
+        // x의 오른쪽에 x보다 작은 값이 존재 -> x의 왼쪽에는 x보다 작은 값 없어야함
+        // 즉, 적어도 자신 기준 왼쪽이나 오른쪽에 자신보다 작은 값이 없는 구간이 존재해야함
+    }
+    
+    return cnt;
 }
