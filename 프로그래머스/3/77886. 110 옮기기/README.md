@@ -4,11 +4,11 @@
 
 ### 성능 요약
 
-메모리: 76.5 MB, 시간: 93.66 ms
+메모리: 76.3 MB, 시간: 66.79 ms
 
 ### 구분
 
-코딩테스트 연습 > 월간 코드 챌린지 시즌2
+ > 
 
 ### 채점결과
 
@@ -16,7 +16,7 @@
 
 ### 제출 일자
 
-2025년 06월 05일 14:00:36
+2026년 05월 08일 15:37:36
 
 ### 문제 설명
 
@@ -65,14 +65,14 @@
 <li>다음 그림은 "1110"을 "1101"로 만드는 과정을 나타낸 것입니다.</li>
 </ul>
 
-<p><img src="https://grepp-programmers.s3.ap-northeast-2.amazonaws.com/files/production/9a8fd58d-71cd-44e9-b9ad-f1f87e653975/110_ex1.png" title="" alt="110_ex1.png"></p>
+<p><img src="https://asset.programmers.co.kr/files/production/9a8fd58d-71cd-44e9-b9ad-f1f87e653975/110_ex1.png" title="" alt="110_ex1.png"></p>
 
 <ul>
 <li><p>"1101"보다 사전 순으로 더 앞에 오는 문자열을 만들 수 없으므로, 배열에 "1101"을 담아야 합니다.</p></li>
 <li><p>다음 그림은 "100111100"을 "100110110"으로 만드는 과정을 나타낸 것입니다.</p></li>
 </ul>
 
-<p><img src="https://grepp-programmers.s3.ap-northeast-2.amazonaws.com/files/production/a0c471b7-5bc0-4c0c-914b-f864919fed37/110_ex2.png" title="" alt="110_ex2.png"></p>
+<p><img src="https://asset.programmers.co.kr/files/production/a0c471b7-5bc0-4c0c-914b-f864919fed37/110_ex2.png" title="" alt="110_ex2.png"></p>
 
 <ul>
 <li>"100110110"보다 사전 순으로 더 앞에 오는 문자열을 만들 수 없으므로, 배열에 "100110110"을 담아야 합니다.</li>
@@ -80,7 +80,7 @@
 <li><p>다음 그림은 "0111111010"을 "0110110111"로 만드는 과정을 나타낸 것입니다.</p></li>
 </ul>
 
-<p><img src="https://grepp-programmers.s3.ap-northeast-2.amazonaws.com/files/production/52534d0b-8883-444e-aa5e-1ca7512a7b7b/110_ex3.png" title="" alt="110_ex3.png"></p>
+<p><img src="https://asset.programmers.co.kr/files/production/52534d0b-8883-444e-aa5e-1ca7512a7b7b/110_ex3.png" title="" alt="110_ex3.png"></p>
 
 <ul>
 <li>"0110110111"보다 사전 순으로 더 앞에 오는 문자열을 만들 수 없으므로, 배열에 "0110110111"을 담아야 합니다.</li>
