@@ -1,54 +1,58 @@
 function solution(numbers) {
     /*
-    살펴본 노드가 더미 노드라면 문자열 뒤에 0을 추가한다.
-    살펴본 노드가 더미 노드가 아니라면 문자열 뒤에 0을 추가한다.
-    문자열에 저장된 이진수를 십진수로 변환한다.
+    높이에 상관없이 왼쪽노드부터 오른쪽 노드부터 살핀다.
+    L -> root -> R 순서(중위 순회)
+
+    살펴본 노드가 더미 노드 -> 문자열 뒤에 0, 아니라면 1
+    문자열에 저장된 이진수를 십진수로 변환
     
-    수가 주어졌을 때 하나의 이진트리로 해당 수를 표현할 수 있는지를 판별
+    수가 주어졌을 때 하나의 이진트리로 해당 수를 표현할 수 있는가?
     
-    풀이 전략
-    - 주어진 십진수를 이진수로 변환한 뒤, 이진트리로 표현할 수 있는지를 확인한다.
-    - 이진수 1 부분의 조건
-        - 부모가 1이어야 함.
-    - 이진수 0 부분의 조건
-        - 부모의 조건에 따라 상관이 없음
-        - 부모가 0이어야 함.
+    수 -> 자리수가 2^x인 이진수로 변환
+    해당 이진수가 이진트리로 변환될 수 있는지 판단
+    
+    
+    자식 노드가 1이라면 부모가 반드시 1
+    자식 노드가 0이라면 부모 상관 X
+    
+    부모가 1이라면 검사 X
+    
+    
     */
-    
     const result = [];
     
-    for(let number of numbers) {
-        number = number.toString(2);
-        
-        let length = 2 ** (Math.floor(Math.log2(number.length)) + 1) - 1; // 2^h - 1
-        number = number.padStart(length, "0");
-        
-        if(canParse(number, 0, number.length - 1)) result.push(1);
-        else result.push(0);    
-    }
-    
-    function canParse(number, left, right) {
-        if(left === right) return true;
-        
-        const mid = Math.floor((left + right) / 2);
-        const canParseLeft = canParse(number, left, mid - 1);
-        
-        if(!canParseLeft) return false;
-        
-        const canParseRight = canParse(number, mid + 1, right);
-        
-        if(!canParseRight) return false;
-        
-        const leftChild = number[Math.floor((left + mid) / 2)];
-        const rightChild = number[Math.ceil((mid + right) / 2)];
-        
-        if(leftChild === '1' || rightChild === '1') { // 자식이 1이라면, 자기 자신도 1이어야 함.
-            if(number[mid] === '1') return true;
-            return false;
+    for(const number of numbers) {
+        if(number === 1) {
+            result.push(1);
+            continue;
         }
         
-        return true;
+        // 자리수 맞추기
+        const bin = number.toString(2);
+        let size = 1;
+        while (size < bin.length) size = size * 2 + 1;
+        
+        const parsed = number.toString(2).padStart(size, '0');
+    
+        if(check(0, size-1, parsed)) result.push(1);
+        else result.push(0);
     }
     
     return result;
+}
+
+function check(l, r, number) {
+    if(l > r) return true;
+    
+    const mid = Math.floor((l + r) / 2);
+    const leftChild = number[Math.floor(l + (mid - 1)) / 2];
+    const rightChild = number[Math.floor((mid + 1) + r) / 2];
+          
+    if(number[mid] === '0') {
+        if(leftChild === '1' || rightChild === '1') {
+            return false;
+        }
+    } 
+    
+    return check(l, mid - 1, number) && check(mid + 1, r, number);
 }
