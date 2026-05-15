@@ -4,11 +4,11 @@
 
 ### 성능 요약
 
-메모리: 76.4 MB, 시간: 1046.94 ms
+메모리: 52.2 MB, 시간: 71.28 ms
 
 ### 구분
 
-코딩테스트 연습 > 2020 KAKAO BLIND RECRUITMENT
+ > 
 
 ### 채점결과
 
@@ -16,7 +16,7 @@
 
 ### 제출 일자
 
-2025년 06월 09일 12:54:58
+2026년 05월 15일 14:43:23
 
 ### 문제 설명
 
@@ -76,7 +76,7 @@
 
 <p>원형 레스토랑에서 외벽의 취약 지점의 위치는 다음과 같습니다.</p>
 
-<p><img src="https://grepp-programmers.s3.amazonaws.com/files/production/61de504978/1c8394ec-05e0-4b7b-a0ff-3ff9ae0cec28.jpg" title="" alt="외벽점검-1.jpg"></p>
+<p><img src="https://asset.programmers.co.kr/files/production/61de504978/1c8394ec-05e0-4b7b-a0ff-3ff9ae0cec28.jpg" title="" alt="외벽점검-1.jpg"></p>
 
 <p>친구들을 투입하는 예시 중 하나는 다음과 같습니다.</p>
 
@@ -91,7 +91,7 @@
 
 <p>원형 레스토랑에서 외벽의 취약 지점의 위치는 다음과 같습니다.</p>
 
-<p><img src="https://grepp-programmers.s3.amazonaws.com/files/production/3669c9b3d6/00e8eeb4-f3ec-4c18-96fb-a3b17aaf1812.jpg" title="" alt="외벽점검-2.jpg"></p>
+<p><img src="https://asset.programmers.co.kr/files/production/3669c9b3d6/00e8eeb4-f3ec-4c18-96fb-a3b17aaf1812.jpg" title="" alt="외벽점검-2.jpg"></p>
 
 <p>7m를 이동할 수 있는 친구가 4m 지점에서 출발해 반시계 방향으로 점검을 돌면 모든 취약 지점을 점검할 수 있습니다. 따라서 친구를 최소 한 명 투입하면 됩니다.</p>
 

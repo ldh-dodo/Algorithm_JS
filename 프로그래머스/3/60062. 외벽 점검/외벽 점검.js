@@ -1,51 +1,85 @@
 function solution(n, weak, dist) {
     /*
-    점검 시간은 1시간이다.
-    친구들이 1시간 동안 이동할 수 있는 거리는 제각각이다.
-    친구들은 시계, 혹은 반시계 방향으로 외벽을 따라서만 이동한다.
-    취약 지점을 점검하기 위해 보내야하는 친구 수의 최소값을 구해야한다.
-    위의 조건을 만족하려면, 취약지점부터 시작해서 이동하는게 좋다.
+    외벽 총 둘레 : n미터
+    취약 지점 손상되지 않았는지 점검. 점검 시간 1시간
+    최소한의 친구들을 투입. 친구들은 외벽을 따라서만 이동
+    weak : 취약지점 위치(오름차순). 전부 다름
+    dist : 각 친구가 1시간 동안 이동할 수 있는 거리
+    return : 취약 지점을 점검하기 위해 보내야 하는 친구 수의 최소값. 
     
-    풀이 전략
-    두 개의 방향을 고려하지않고, 배열을 두 배로 늘려서 한 방향에 대한 조건만 고려한다.
-    1시간 동안 이동할 수 있는 거리가 가장 긴 친구들부터 보내면 최적이다.
+    1 <= n <= 200
+    1 <= weak.length <= 15
+    0 <= weak[x] <= n - 1
+    1 <= dist.length <= 8
+    1 <= dist[x] <= 100
     */
     
+    
+    /*
+    n: 12
+    0 1 2 3 4 5 6 7 8 9 10 11 0 11 10 9 8 7 6 5 4 3 2 1 
+    
+    투입할 친구는 전부 취약지점에서 시작하면 됨
+    친구 배치를 순열로 만들어서
+    */
+    let answer = -1;
+    
+    // 반시계 방향까지 포함
     const weakLen = weak.length;
-    weak = [...weak, ...weak.map((el) => el + n)];
-    dist = dist.sort((a, b) => b - a);
+    const added = [];
+    
+    for(let i = 0; i < weakLen; i++) weak.push(weak[i] + n);
+    
+    
     
     for(let i = 1; i <= dist.length; i++) {
-        const permutations = getPermutations(dist, i);
-        
-        for(const per of permutations) {
-            for(let j = 0; j < weakLen; j++) {
-                let sliceWeak = weak.slice(j, j + weakLen);
+        const perms = permutation(dist, i);
+
+        for(let j = 0; j+weakLen <= weak.length; j++) {
+            const sliced = weak.slice(j, j+weakLen);
+            
+            for(const perm of perms) {
+                let idx = 0;
                 
-                for(const p of per) {
-                    const checkNum = p + sliceWeak[0];
-                    
-                    sliceWeak = sliceWeak.filter((el) => el > checkNum);
-                    if(sliceWeak.length === 0) return i;
+                for(const distIdx of perm) {
+                    const reach = sliced[idx] + dist[distIdx];
+                    while(idx < weakLen && sliced[idx] <= reach) idx++;
+                    if(idx === weakLen) break;
                 }
+                
+                if(idx === weakLen) return i;
             }
         }
     }
     
-    function getPermutations(arr, num) {
-        if(num === 1) return arr.map((el) => [el]);
+    
+    return answer;
+}
+
+function permutation(arr, n) {
+    const result = [];
+    const visited = Array(arr.length).fill(false);
+    
+    function dfs(path) {
+        if(path.length === n) {
+            result.push([...path]);
+            return;
+        }
         
-        const res = [];
-        
-        arr.forEach((el, idx, origin) => {
-            const rest = [...origin.slice(0, idx), ...origin.slice(idx + 1)];
-            const permutations = getPermutations(rest, num - 1);
-            const combined = permutations.map((com) => [el, ...com]);
-            res.push(...combined);
-        });
-        
-        return res;
+        for(let i = 0; i < arr.length; i++) {
+            if(visited[i]) continue;
+            
+            visited[i] = true;
+            path.push(i);
+            
+            dfs(path);
+            
+            visited[i] = false;
+            path.pop();
+        }
     }
     
-    return -1;
+    dfs([]);
+    
+    return result;
 }
